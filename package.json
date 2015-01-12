@@ -6,5 +6,9 @@
     "lib/json.lua",
     "lib/libpacyak.lua",
     "etc/lists.txt"
-  ]
+  ],
+  "links": {
+    "/usr/bin/pacyak.lua": "bin/pacyak.lua",
+    "/etc/pacyak/": "etc/"
+  }
 }
