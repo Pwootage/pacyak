@@ -1,0 +1,10 @@
+{
+  "name": "pacyak",
+  "version": "0.0.1",
+  "files": [
+    "bin/pacyak.lua",
+    "lib/json.lua",
+    "lib/libpacyak.lua",
+    "etc/lists.txt"
+  ]
+}
