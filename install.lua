@@ -3,40 +3,51 @@
 -----------------------------------------
 -- Installs PacYak into the filesystem --
 -----------------------------------------
-
 local process = require("process")
 local filesystem = require("filesystem")
 local serialization = require("serialization")
+local internet = require("internet")
+local event = require("event")
 
--- So we know where we are
-local currentProcess = process.running()
+local tmplib = os.tmpname()
 
--- Dirty dirty hack (won't work if anyone renames anything)
-local parent = currentProcess:sub(0, currentProcess:len() - 11)
+function main()
+    -- Find the list of files to download
+    print("Downloading JSON lib")
 
--- Backup original path
-local origPath = package.path
+    local json = dl("https://raw.githubusercontent.com/Pwootage/pacyak/master/lib/json.lua")
 
--- And pacyak's dirs to the path, temporaily
-package.path = package.path .. ";" .. parent .. "/lib/?.lua"
+    write(tmplib.."/json.lua", json)
 
-function bootstrap()
-    local json = require("json")
-    local libpacyak = require("libpacyak")
-
-    local pkg = json.decode(libpacyak.loadFile(parent .. "/package.json"))
-    libpacyak.loadPackage(pkg)
+    
 end
 
-local status, err = pcall(bootstrap)
+function dl(url)
+    local res = ""
 
+    local req = internet.request(url)
+    for line in req do
+        res = res .. line .. "\n"
+    end
+
+    return res
+end
+
+function write(path, data)
+    local f = io.open(path, "w")
+    f:write(data)
+    f:close()
+end
+
+local origPath = package.path
+filesystem.makeDirectory(tmplib)
+-- Main entry point
+local status, err = pcall(main)
 if status then
     print("Successfully installed :D")
 else
     print("Failed to install :(")
     print(err)
 end
-
--- Revert path
 package.path = origPath
-
+filesystem.remove(tmplib)

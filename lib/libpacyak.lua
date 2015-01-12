@@ -8,6 +8,10 @@ local libpacyak = {}
 
 local packages = {}
 
+function libpacyak.init()
+    -- Load packages
+end
+
 --- Useful function
 function libpacyak.loadFile(path)
     local f = io.open(path, "r")
@@ -26,6 +30,5 @@ end
 function libpacyak.loadPackage(package)
     packages[package.name] = package
 end
-
 
 return libpacyak
