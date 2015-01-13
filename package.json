@@ -9,14 +9,14 @@
 
     "lib/json.lua",
     "lib/libpacyak.lua",
-    
+
     "etc/lists.txt"
   ],
   "links": {
-    "/usr/bin/pacyak.lua": "bin/pacyak.lua",
-    "/etc/pacyak/": "etc/"
+    "/usr/bin/pacyak.lua": "bin/pacyak.lua"
   },
   "install": {
-    "/boot/98_pacyak.lua": "bin/98_pacyak.lua"
+    "/boot/98_pacyak.lua": "bin/98_pacyak.lua",
+    "/etc/pacyak/lists.txt":"etc/lists.txt"
   }
 }

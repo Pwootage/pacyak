@@ -1,0 +1,13 @@
+{
+  "name": "test",
+  "version": "0.0.1",
+  "files": [
+    "package.json",
+    "test.lua"
+  ],
+  "links": {
+    "/usr/bin/test.lua": "test.lua"
+  },
+  "install": {
+  }
+}

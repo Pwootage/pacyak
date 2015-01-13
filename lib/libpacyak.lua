@@ -28,9 +28,10 @@ function libpacyak.loadFile(path)
     return res
 end
 
-
 --- Download a URL and return it as a string
 function libpacyak.download(url)
+    local internet = require("internet")
+
     local res = ""
 
     local req = internet.request(url)
@@ -79,8 +80,19 @@ function libpacyak.loadKVP(path)
 end
 
 --- Load all package lists
-function libpacyak.loadLists()
+function libpacyak.packageUrls()
     local ret = {}
+
+    local listd = "/etc/pacyak/lists.d/"
+
+    for list in filesystem.list(listd) do
+        if not filesystem.isDirectory(listd .. list) then
+            local l = libpacyak.loadKVP(listd .. list)
+            for k, v in pairs(l) do
+                ret[k] = v
+            end
+        end
+    end
 
     return ret
 end
@@ -107,7 +119,16 @@ end
 
 --- Install a package by name
 function libpacyak.install(package)
-    local pkg = libpacyak.findPacakgeInLists(package)
+    if packages[package] then
+        print("Error: Package " .. package .. " is already installed; please uninstall if you wish to reinstall.")
+    else
+        local url = libpacyak.packageUrls()[package]
+        if url then
+            libpacyak.httpInstall(url)
+        else
+            print("Unknown package: " .. package)
+        end
+    end
 end
 
 function libpacyak.findPacakgeInLists(package)
@@ -115,6 +136,7 @@ function libpacyak.findPacakgeInLists(package)
 end
 
 function libpacyak.httpInstall(path)
+    print("We should be installing the package at url " .. path)
 end
 
 return libpacyak
