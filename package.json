@@ -3,10 +3,13 @@
   "version": "0.0.1",
   "files": [
     "package.json",
-    "bin/150_pacyak.lua",
+
+    "bin/98_pacyak.lua",
     "bin/pacyak.lua",
+
     "lib/json.lua",
     "lib/libpacyak.lua",
+    
     "etc/lists.txt"
   ],
   "links": {
@@ -14,6 +17,6 @@
     "/etc/pacyak/": "etc/"
   },
   "install": {
-    "/boot/150_pacyak.lua": "bin/150_pacyak.lua"
+    "/boot/98_pacyak.lua": "bin/98_pacyak.lua"
   }
 }
