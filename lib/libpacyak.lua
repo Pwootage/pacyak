@@ -204,6 +204,9 @@ function libpacyak.uninstall(package)
             filesystem.remove(dest)
         end
 
+        print("Removing '" .. fsBase.. "'...")
+        filesystem.remove(fsBase)
+
         print("Rebooting in 5 seconds to complete install...")
         os.sleep(5)
         computer.shutdown(true)
