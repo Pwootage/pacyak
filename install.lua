@@ -38,11 +38,11 @@ function main()
         write(fsUrl, dl(webUrl))
     end
 
-    for src, dest in pairs(pacyak.install) do
-        local sfile = fsBase.."/"..src
-        print(sfile)
-        print(dest)
---        write(fsUrl, dl(webUrl))
+    for dest, src in pairs(pacyak.install) do
+        local sfile = fsBase .. "/" .. src
+
+        print("Copying " .. sfile .. " to " .. dest)
+        filesystem.copy(sfile, dest)
     end
 end
 

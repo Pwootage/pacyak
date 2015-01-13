@@ -14,6 +14,6 @@
     "/etc/pacyak/": "etc/"
   },
   "install": {
-    "/boot/101_pacyak.lua": "bin/101_pacyak.lua"
+    "/boot/150_pacyak.lua": "bin/150_pacyak.lua"
   }
 }
