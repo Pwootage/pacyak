@@ -3,6 +3,7 @@ local json = require("json")
 local filesystem = require("filesystem")
 local serialization = require("serialization")
 local computer = require("computer")
+local event = require("event")
 
 -- Export module
 local libpacyak = {}
@@ -146,18 +147,34 @@ end
 --- Install a package by name
 function libpacyak.install(package)
     if packages[package] then
-        print("Error: Package " .. package .. " is already installed; please uninstall if you wish to reinstall.")
-    else
-        local url = libpacyak.packageUrls()[package]
-        if url then
-            print("Installing " .. package)
-            libpacyak.httpInstall(url)
-            print("Rebooting in 5 seconds to complete install...")
-            os.sleep(5)
-            computer.shutdown(true)
-        else
-            print("Unknown package: " .. package)
+        print("Warning: Package " .. package .. " is already installed; install will stomp files, but it may not work for all packages. If it does not, try uninstalling and reinstalling.")
+        io.write("Continue? [Y]/n ")
+        while true do
+            local _, _, k = event.pull("key_down")
+            if k == string.byte("n") or k == string.byte("N") then
+                print(string.char(k))
+                return
+            elseif k == string.byte("y") or k == string.byte("Y") then
+                print(string.char(k))
+                break
+            elseif k == 10 or k == 13 then
+                print("Y")
+                break
+            else
+                -- Continue
+            end
         end
+    end
+
+    local url = libpacyak.packageUrls()[package]
+    if url then
+        print("Installing " .. package)
+        libpacyak.httpInstall(url)
+        print("Rebooting in 5 seconds to complete install...")
+        os.sleep(5)
+        computer.shutdown(true)
+    else
+        print("Unknown package: " .. package)
     end
 end
 
