@@ -9,6 +9,7 @@ local serialization = require("serialization")
 local internet = require("internet")
 local term = require("term")
 local event = require("event")
+local computer = require("computer")
 
 local tmplib = os.tmpname()
 
@@ -76,7 +77,7 @@ function main()
 
         local parent = getParent(dest)
         filesystem.makeDirectory(parent)
-        
+
         filesystem.copy(sfile, dest)
     end
 end
@@ -138,6 +139,9 @@ package.path = origPath .. ";" .. tmplib .. "/?.lua"
 local status, err = pcall(main)
 if status then
     print("Successfully installed :D")
+    print("Rebooting in 5 seconds to complete install...")
+    os.sleep(5)
+    computer.shutdown(true)
 else
     print("Failed to install :(")
     print(err)

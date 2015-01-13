@@ -6,9 +6,9 @@ print()
 local args = table.pack(...)
 
 if args[1] == "install" then
-    print("Installing " .. args[2])
-
     libpackyak.install(args[2])
+elseif args[1] == "uninstall" then
+    libpackyak.uninstall(args[2])
 elseif args[1] == "update" then
     libpackyak.updateLists()
 elseif args[1] == "list" then

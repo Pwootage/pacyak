@@ -2,6 +2,7 @@
 local json = require("json")
 local filesystem = require("filesystem")
 local serialization = require("serialization")
+local computer = require("computer")
 
 -- Export module
 local libpacyak = {}
@@ -10,6 +11,21 @@ local packages = {}
 
 function libpacyak.init()
     -- Load packages
+end
+
+--- Useful
+function libpacyak.getParent(path)
+    -- Find last "/"
+    local last = path:len()
+    for i = path:len(), 1, -1 do
+        local c = path:sub(i, i)
+        if c == '/' then
+            last = i
+            break
+        end
+    end
+
+    return path:sub(1, last)
 end
 
 --- Useful function
@@ -26,6 +42,16 @@ function libpacyak.loadFile(path)
     end
     f:close()
     return res
+end
+
+--- Another useful funciton
+function libpacyak.writeFile(path, data)
+    local parent = libpacyak.getParent(path)
+    filesystem.makeDirectory(parent)
+
+    local file = io.open(path, "w")
+    file:write(data)
+    file:close()
 end
 
 --- Download a URL and return it as a string
@@ -124,10 +150,46 @@ function libpacyak.install(package)
     else
         local url = libpacyak.packageUrls()[package]
         if url then
+            print("Installing " .. package)
             libpacyak.httpInstall(url)
+            print("Rebooting in 5 seconds to complete install...")
+            os.sleep(5)
+            computer.shutdown(true)
         else
             print("Unknown package: " .. package)
         end
+    end
+end
+
+--- Uninstall a package by name
+function libpacyak.uninstall(package)
+    if not packages[package] then
+        print("Error: Package " .. package .. " is not installed; cannot uninstall.")
+    else
+        local pkg = packages[package]
+
+        print("Removing package " .. package)
+        print("Files to remove: " .. (#pkg.files + #pkg.install))
+
+        local fsBase = "/usr/share/pacyak/" .. pkg.name .. "/"
+
+        for _, file in ipairs(pkg.files) do
+            local fsUrl = fsBase .. "/" .. file
+
+            print("Removing '" .. fsUrl .. "'...")
+
+            filesystem.remove(fsUrl)
+        end
+
+        for dest, src in pairs(pkg.install) do
+            print("Removing '" .. dest .. "'...")
+
+            filesystem.remove(dest)
+        end
+
+        print("Rebooting in 5 seconds to complete install...")
+        os.sleep(5)
+        computer.shutdown(true)
     end
 end
 
@@ -136,7 +198,33 @@ function libpacyak.findPacakgeInLists(package)
 end
 
 function libpacyak.httpInstall(path)
-    print("We should be installing the package at url " .. path)
+    print("Downloading package description from " .. path .. "/package.json")
+
+    local pkg = json.decode(libpacyak.download(path .. "/package.json"))
+
+    local fsBase = "/usr/share/pacyak/" .. pkg.name .. "/"
+
+    print("Found " .. #pkg.files .. " files to download.")
+
+    for _, file in ipairs(pkg.files) do
+        local webUrl = path .. "/" .. file
+        local fsUrl = fsBase .. "/" .. file
+
+        print("Downloading '" .. webUrl .. "'...")
+
+        libpacyak.writeFile(fsUrl, libpacyak.download(webUrl))
+    end
+
+    for dest, src in pairs(pkg.install) do
+        local sfile = fsBase .. "/" .. src
+
+        print("Copying " .. sfile .. " to " .. dest)
+
+        local parent = libpacyak.getParent(dest)
+        filesystem.makeDirectory(parent)
+
+        filesystem.copy(sfile, dest)
+    end
 end
 
 return libpacyak
