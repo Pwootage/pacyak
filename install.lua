@@ -54,7 +54,7 @@ function main()
             local dest = fsBase .. "/" .. file
 
             print("Copying " .. src .. " to " .. dest)
-            
+
             filesystem.copy(src, dest)
         else
             local webUrl = webBase .. "/" .. file
