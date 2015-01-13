@@ -55,6 +55,9 @@ function main()
 
             print("Copying " .. src .. " to " .. dest)
 
+            local parent = getParent(dest)
+            filesystem.makeDirectory(parent)
+
             filesystem.copy(src, dest)
         else
             local webUrl = webBase .. "/" .. file
@@ -70,6 +73,10 @@ function main()
         local sfile = fsBase .. "/" .. src
 
         print("Copying " .. sfile .. " to " .. dest)
+
+        local parent = getParent(dest)
+        filesystem.makeDirectory(parent)
+        
         filesystem.copy(sfile, dest)
     end
 end

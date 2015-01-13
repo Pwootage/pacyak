@@ -17,6 +17,6 @@
   },
   "install": {
     "/boot/98_pacyak.lua": "bin/98_pacyak.lua",
-    "/etc/pacyak/lists.txt":"etc/lists.txt"
+    "/etc/pacyak/lists.txt": "etc/lists.txt"
   }
 }
