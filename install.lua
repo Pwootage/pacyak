@@ -12,30 +12,58 @@ local event = require("event")
 
 local tmplib = os.tmpname()
 
+local localInstall = false
+local args = table.pack(...)
+
 function main()
+    if args[1] == "local" then
+        localInstall = true
+    end
+
     local webBase = "https://raw.githubusercontent.com/Pwootage/pacyak/master"
+    local localBase = getParent(process.running())
 
-    print("Downloading JSON lib to " .. tmplib .. "/json.lua")
-    write(tmplib .. "/json.lua", dl(webBase .. "/lib/json.lua"))
+    if localInstall then
+        print("Copying JSON lib to " .. tmplib .. "/json.lua")
+        filesystem.copy(localBase .. "/lib/json.lua", tmplib .. "/json.lua")
+    else
+        print("Downloading JSON lib to " .. tmplib .. "/json.lua")
+        write(tmplib .. "/json.lua", dl(webBase .. "/lib/json.lua"))
+    end
 
-    print("Loading downloaded lib...")
+    print("Loading JSON lib...")
     local json = require("json")
 
-    print("Downloading PacYak package definition")
-    local pacyak = json.decode(dl(webBase .. "/package.json"))
-
-    print("Number of files to download: " .. #pacyak.files)
+    local pacyak
+    if localInstall then
+        print("Loading PacYak package definition")
+        pacyak = json.decode(read(localBase .. "/package.json"))
+        print("Number of files to copy: " .. #pacyak.files)
+    else
+        print("Downloading PacYak package definition")
+        pacyak = json.decode(dl(webBase .. "/package.json"))
+        print("Number of files to download: " .. #pacyak.files)
+    end
 
     local fsBase = "/usr/share/pacyak/pacyak"
-    filesystem.makeDirectory(webBase)
+    filesystem.makeDirectory(fsBase)
 
     for _, file in ipairs(pacyak.files) do
-        local webUrl = webBase .. "/" .. file
-        local fsUrl = fsBase .. "/" .. file
+        if localInstall then
+            local src = localBase .. "/" .. file
+            local dest = fsBase .. "/" .. file
 
-        print("Downloading '" .. file .. "'...")
+            print("Copying " .. src .. " to " .. dest)
+            
+            filesystem.copy(src, dest)
+        else
+            local webUrl = webBase .. "/" .. file
+            local fsUrl = fsBase .. "/" .. file
 
-        write(fsUrl, dl(webUrl))
+            print("Downloading '" .. file .. "'...")
+
+            write(fsUrl, dl(webUrl))
+        end
     end
 
     for dest, src in pairs(pacyak.install) do
@@ -57,7 +85,7 @@ function dl(url)
     return res
 end
 
-function write(path, data)
+function getParent(path)
     -- Find last "/"
     local last = path:len()
     for i = path:len(), 1, -1 do
@@ -68,13 +96,30 @@ function write(path, data)
         end
     end
 
-    local parent = path:sub(1, last)
+    return path:sub(1, last)
+end
+
+function write(path, data)
+    local parent = getParent(path)
 
     filesystem.makeDirectory(parent)
 
     local file = io.open(path, "w")
     file:write(data)
     file:close()
+end
+
+function read(path)
+    local file = io.open(path, "r")
+    local res = ""
+    local done = false
+    while true do
+        local r = file:read(1024)
+        if r == nil then break end
+        res = res .. r
+    end
+    file:close()
+    return res
 end
 
 -- Setup temp path

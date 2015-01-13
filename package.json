@@ -9,7 +9,7 @@
 
     "lib/json.lua",
     "lib/libpacyak.lua",
-    
+
     "etc/lists.txt"
   ],
   "links": {
